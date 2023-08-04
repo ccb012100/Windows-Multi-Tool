@@ -14,13 +14,19 @@ namespace WindowsMultiTool
 
             GlobalSystemMediaTransportControlsSession session = sessionManager.GetCurrentSession();
 
-            // TODO: notification when there is no current media session
-            if (session == null) return;
+            if (session == null)
+            {
+                Notifications.ShowWarningToast("No current SMTC session");
+                return;
+            }
 
             GlobalSystemMediaTransportControlsSessionMediaProperties mediaProperties = await session.TryGetMediaPropertiesAsync();
 
-            // TODO: notification when there are no media properties
-            if (mediaProperties == null) return;
+            if (mediaProperties == null)
+            {
+                Notifications.ShowErrorToast("The MediaProperties on the GMTC session was null.");
+                return;
+            }
 
             // for documentation, see:
             // <https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/send-local-toast?tabs=desktop-msix>
