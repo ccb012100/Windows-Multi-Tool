@@ -9,6 +9,10 @@
 		<ApplicationIcon>multitool.ico</ApplicationIcon>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <Optimize>False</Optimize>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <Compile Remove="ObjectExtensions.cs" />
 	</ItemGroup>
@@ -18,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
 		<PackageReference Include="ObjectDumper.NET" Version="4.1.3" />
 	</ItemGroup>
 

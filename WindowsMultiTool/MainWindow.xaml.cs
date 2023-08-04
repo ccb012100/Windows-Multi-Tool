@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System;
 using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Media;
+using Windows.UI.Notifications;
 
 namespace WindowsMultiTool
 {
@@ -12,15 +12,18 @@ namespace WindowsMultiTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int BALLOON_TIP_DURATION_MS = 3000;
+        /// <summary>
+        /// System tray icon
+        /// </summary>
         private readonly NotifyIcon _notifyIcon;
+
+        /// <summary>
+        /// Context menu for the system tray icon
+        /// </summary>
         private readonly ContextMenuStrip _contextMenuStrip;
+
         public MainWindow()
         {
-            Console.WriteLine("entered MainWindow");
-            // InitializeComponent call is required to merge the UI
-            // that is defined in markup with this class, including  
-            // setting properties and registering event handlers
             InitializeComponent();
 
             // create and initialize NotifyIcon
@@ -33,26 +36,22 @@ namespace WindowsMultiTool
             _notifyIcon.ContextMenuStrip = _contextMenuStrip;
 
             // show initial application start notification
-            _notifyIcon.ShowBalloonTip(BALLOON_TIP_DURATION_MS);
+            new ToastContentBuilder().AddText("Application started").Show(toast => { toast.ExpirationTime = DateTime.Now.AddSeconds(1); });
 
             void InitializeNotifyIcon()
             {
-                _notifyIcon.BalloonTipText = "Windows Multi-tool has started";
                 _notifyIcon.Icon = new Icon(@".\Icons\multitool.ico");
                 _notifyIcon.Text = "Windows Multi-Tool";
                 _notifyIcon.Visible = true;
             }
+
             void InitializeContextMenu()
             {
-                var exitButton = new ToolStripButton
-                {
-                    Text = "🛑 Exit"
-                };
+                var exitButton = new ToolStripButton { Text = "🛑 Exit" };
                 exitButton.Click += ExitButton_Click;
 
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 _contextMenuStrip.Items.Add(exitButton);
-
                 _contextMenuStrip.Width = 200;
             }
         }
@@ -62,23 +61,13 @@ namespace WindowsMultiTool
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ExitButton_Click(object? sender, EventArgs? e)
-        {
-            System.Windows.Application.Current.Shutdown();
-        }
+        void ExitButton_Click(object? sender, EventArgs? e) => System.Windows.Application.Current.Shutdown();
 
         /// <summary>
-        /// Show Volume and Now Playing popup on click.
+        /// Show Current Media metadata notification on click.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void MediaPopupButton_Click(object? sender, RoutedEventArgs? e)
-        {
-            var mediaProperties = await NowPlaying.GetMediaProperties();
-
-            _notifyIcon.BalloonTipText = mediaProperties.Dump();
-
-            _notifyIcon.ShowBalloonTip(BALLOON_TIP_DURATION_MS);
-        }
+        private async void NowPlayingButton_Click(object? sender, RoutedEventArgs? e) => await NowPlaying.ShowToast();
     }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowsMultiTool"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Windows Multi-Tool"
         MaxHeight="600"
         MaxWidth="800">
     <Grid ShowGridLines="True" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -18,12 +18,12 @@
         </Grid.RowDefinitions>
         <Button
             Background="CadetBlue"
-            Click="MediaPopupButton_Click"
+            Click="NowPlayingButton_Click"
             Foreground="White"
             Grid.Row="0"
             Height="100" Width="200"
             Margin="5"
-            Name="MediaPopupButton" 
+            Name="nowPlayingButton" 
             >⏯️ 🔊 Now Playing</Button>
         <Button 
             Click="ExitButton_Click"
@@ -32,7 +32,7 @@
             Grid.Row="1"
             Height="100" Width="200"
             Margin="5"
-            Name="ExitButton" 
+            Name="exitButton" 
             >🛑 Exit</Button>
     </Grid>
 </Window>
