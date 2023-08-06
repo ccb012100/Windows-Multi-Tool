@@ -12,6 +12,8 @@ namespace WindowsMultiTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const int CONTEXT_MENU_WIDTH = 200;
+
         /// <summary>
         /// System tray icon
         /// </summary>
@@ -24,6 +26,7 @@ namespace WindowsMultiTool
 
         public MainWindow()
         {
+            ToastNotificationManagerCompat.History.Clear();
             InitializeComponent();
 
             // create and initialize NotifyIcon
@@ -33,26 +36,31 @@ namespace WindowsMultiTool
             InitializeNotifyIcon();
             InitializeContextMenu();
 
-            _notifyIcon.ContextMenuStrip = _contextMenuStrip;
-
             // show initial application start notification
-            new ToastContentBuilder().AddText("Application started").Show(toast => { toast.ExpirationTime = DateTime.Now.AddSeconds(1); });
+            new ToastContentBuilder().AddText("Application started").Show(toast => { toast.ExpirationTime = DateTime.Now; });
 
             void InitializeNotifyIcon()
             {
                 _notifyIcon.Icon = new Icon(@".\Icons\multitool.ico");
                 _notifyIcon.Text = "Windows Multi-Tool";
                 _notifyIcon.Visible = true;
+                _notifyIcon.ContextMenuStrip = _contextMenuStrip;
             }
 
             void InitializeContextMenu()
             {
-                var exitButton = new ToolStripButton { Text = "🛑 Exit" };
+                ToolStripButton nowPlayingButton = NewButton("⏯️ 🔊 Now Playing");
+                nowPlayingButton.Click += NowPlayingButton_Click;
+
+                ToolStripButton exitButton = NewButton("🛑 Exit");
                 exitButton.Click += ExitButton_Click;
 
+                _contextMenuStrip.Width = CONTEXT_MENU_WIDTH;
+                _contextMenuStrip.Items.Add(nowPlayingButton);
                 _contextMenuStrip.Items.Add(new ToolStripSeparator());
                 _contextMenuStrip.Items.Add(exitButton);
-                _contextMenuStrip.Width = 200;
+
+                ToolStripButton NewButton(string text) => new() { Text = text, AutoSize = false, Width = CONTEXT_MENU_WIDTH, Alignment = ToolStripItemAlignment.Left };
             }
         }
 
@@ -61,13 +69,19 @@ namespace WindowsMultiTool
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ExitButton_Click(object? sender, EventArgs? e) => System.Windows.Application.Current.Shutdown();
+        private void ExitButton_Click(object? sender, EventArgs? e) => ExitApplication();
 
         /// <summary>
         /// Show Current Media metadata notification on click.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void NowPlayingButton_Click(object? sender, RoutedEventArgs? e) => await NowPlaying.ShowToast();
+        private async void NowPlayingButton_Click(object? sender, EventArgs? e) => await NowPlaying.ShowToast();
+
+        private static void ExitApplication()
+        {
+            ToastNotificationManagerCompat.History.Clear();
+            System.Windows.Application.Current.Shutdown();
+        }
     }
 }

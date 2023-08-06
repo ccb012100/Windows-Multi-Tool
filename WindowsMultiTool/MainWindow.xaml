@@ -7,8 +7,9 @@
         mc:Ignorable="d"
         Title="Windows Multi-Tool"
         MaxHeight="600"
-        MaxWidth="800">
-    <Grid ShowGridLines="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+        MaxWidth="800"
+        Visibility="Hidden">
+    <Grid ShowGridLines="True" HorizontalAlignment="Center" VerticalAlignment="Center" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>

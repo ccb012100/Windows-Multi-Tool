@@ -1,8 +1,14 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using Windows.Media.Control;
+using Windows.Storage.Streams;
 
 namespace WindowsMultiTool
 {
@@ -35,11 +41,8 @@ namespace WindowsMultiTool
             // Dedupe list since AlbumArtist always contains Artist
             var artists = new SortedSet<string> { mediaProperties.AlbumArtist, mediaProperties.Artist };
 
-            // TODO: use generic image when/if mediaProperties.Thumbnail is null
-            if (mediaProperties.Thumbnail != null)
-            {
-                // TODO: add image to toast notification
-            }
+            // TODO: use mediaProperties.Thumbnail image (can't figure out how to convert the stream to a URI)
+            builder.AddInlineImage(new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Icons\wave.png")));
 
             builder
                 .AddText(mediaProperties.Title)
