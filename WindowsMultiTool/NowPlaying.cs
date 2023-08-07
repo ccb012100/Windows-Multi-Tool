@@ -1,54 +1,70 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System;
+﻿using Microsoft.Windows.AppNotifications;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
+using System;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using Windows.Media.Control;
-using Windows.Storage.Streams;
+using Microsoft.Windows.AppNotifications.Builder;
 
 namespace WindowsMultiTool
 {
     internal static class NowPlaying
     {
-        public static async Task ShowToast()
+        public const int ScenarioId = 1;
+        public const string ScenarioName = "Now Playing Toast";
+
+        public static async Task<bool> SendToast()
         {
             var sessionManager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
 
             GlobalSystemMediaTransportControlsSession session = sessionManager.GetCurrentSession();
 
-            if (session == null)
-            {
-                Notifications.ShowWarningToast("No current SMTC session");
-                return;
-            }
+            if (session == null) return SendErrorToast("No current SMTC session");
 
             GlobalSystemMediaTransportControlsSessionMediaProperties mediaProperties = await session.TryGetMediaPropertiesAsync();
 
-            if (mediaProperties == null)
-            {
-                Notifications.ShowErrorToast("The MediaProperties on the GMTC session was null.");
-                return;
-            }
-
-            // for documentation, see:
-            // <https://learn.microsoft.com/en-us/windows/apps/design/shell/tiles-and-notifications/send-local-toast?tabs=desktop-msix>
-            var builder = new ToastContentBuilder();
+            if (mediaProperties == null) return SendErrorToast("The MediaProperties on the GMTC session was null.");
 
             // Dedupe list since AlbumArtist always contains Artist
             var artists = new SortedSet<string> { mediaProperties.AlbumArtist, mediaProperties.Artist };
 
-            // TODO: use mediaProperties.Thumbnail image (can't figure out how to convert the stream to a URI)
-            builder.AddInlineImage(new Uri(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Icons\wave.png")));
-
-            builder
+            var notification = new AppNotificationBuilder()
+                .SetTag(nameof(NowPlaying))
                 .AddText(mediaProperties.Title)
                 .AddText(string.Join(", ", artists))
                 .AddText(mediaProperties.AlbumTitle)
-                .Show(toast => { toast.ExpirationTime = DateTime.Now.AddMinutes(10); });
+                .BuildNotification();
+
+            // TODO: use mediaProperties.Thumbnail image for inline image
+
+            notification.ExpiresOnReboot = true;
+
+            AppNotificationManager.Default.Show(notification);
+
+            return notification.Id != 0; // return true if the toast was sent (if it has an Id)
+        }
+
+        public static void NotificationReceived(AppNotificationActivatedEventArgs notificationActivatedEventArgs)
+        {
+            // NOOP
+            Console.WriteLine(notificationActivatedEventArgs);
+        }
+
+        private static bool SendErrorToast(string message)
+        {
+            var notification = new AppNotificationBuilder()
+                .SetTag(nameof(NowPlaying))
+                .SetHeroImage(new Uri("ms-appx:///Assets/wave.png"))
+                .SetAppLogoOverride(new Uri("ms-appx:///Assets/wave.png"))
+                .AddText(message)
+                .BuildNotification();
+
+            // TODO: use System error icon for inline image
+
+            notification.ExpiresOnReboot = true;
+
+            AppNotificationManager.Default.Show(notification);
+
+            return notification.Id != 0;
         }
     }
 }

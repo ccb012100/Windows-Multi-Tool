@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WindowsMultiTool (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WindowsMultiTool (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
