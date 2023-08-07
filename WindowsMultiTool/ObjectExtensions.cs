@@ -1,5 +1,4 @@
-﻿using ObjectDumper;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace WindowsMultiTool
 {
